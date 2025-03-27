@@ -20,7 +20,7 @@ use revm::{
     database::{CacheDB, DatabaseRef},
     inspector::NoOpInspector,
     precompile::{PrecompileSpecId, Precompiles},
-    primitives::{hardfork::SpecId, EnvWithHandlerCfg, HashMap as Map, Log, KECCAK_EMPTY},
+    primitives::{hardfork::SpecId, HashMap as Map, Log, KECCAK_EMPTY},
     state::{Account, AccountInfo, EvmState, EvmStorageSlot},
     Database, DatabaseCommit, JournaledState,
 };
@@ -764,15 +764,15 @@ impl Backend {
     #[instrument(name = "inspect", level = "debug", skip_all)]
     pub fn inspect<I: InspectorExt>(
         &mut self,
-        env: &mut EnvWithHandlerCfg,
+        env: &mut Env,
         inspector: &mut I,
     ) -> eyre::Result<ResultAndState> {
         self.initialize(env);
         let mut evm = crate::utils::new_evm_with_inspector(self, env.clone(), inspector);
 
-        let res = evm.transact().wrap_err("EVM error")?;
+        let res = evm.replay().wrap_err("EVM error")?;
 
-        env.env = evm.context.evm.inner.env;
+        *env = evm.data.ctx.as_env_mut().to_owned();
 
         Ok(res)
     }
