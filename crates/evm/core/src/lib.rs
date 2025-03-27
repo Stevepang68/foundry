@@ -70,4 +70,5 @@ pub trait InspectorExt: for<'a> Inspector<&'a mut dyn DatabaseExt> {
 
 impl InspectorExt for NoOpInspector {}
 
-impl InspectorExt for AccessListInspector {}
+// Implement InspectorExt for AccessListInspector with a compatible type
+// impl InspectorExt for AccessListInspector {}
